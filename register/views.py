@@ -11,7 +11,7 @@ from django.core import serializers
 @csrf_exempt
 
 def register(request):
-    print(request.body)
+    # print(request.body)
     # req=serializers.serialize("json",request)
     # data = serializers.serialize("json", request.body)
     # print(data)
@@ -25,7 +25,7 @@ def register(request):
         return JsonResponse({"status": "ERROR","data":errors})
 
     hashed_password = bcrypt.hashpw(body['password'].encode(), bcrypt.gensalt()).decode('utf-8')
-    user = User(name=body['name'], mobile=body['mobile'], password=hashed_password, email=body['email'])
+    user = User(name=body['name'], mobile=body['mobile'], password=hashed_password, email=body['email'],username=body['username'])
     # body_unicode = user.decode('utf-8')
     user.save()
     # user = json.loads(body_unicode)
@@ -37,9 +37,9 @@ def register(request):
 def login(request):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
-    print(User.objects.filter(email=body['email']).exists())
-    if (User.objects.filter(email=body['email']).exists()):
-        user = User.objects.filter(email=body['email'])[0]
+    # print(User.objects.filter(username=body['username']).exists())
+    if (User.objects.filter(username=body['username']).exists()):
+        user = User.objects.filter(username=body['username'])[0]
         if (bcrypt.checkpw(body['password'].encode('utf-8'), user.password.encode('utf-8'))):
             dict_obj = model_to_dict( user )
             return JsonResponse({"status": "OK","name":dict_obj["name"],"mobile":dict_obj["mobile"],"email":dict_obj["email"]})

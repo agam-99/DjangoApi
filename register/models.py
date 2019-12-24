@@ -1,10 +1,15 @@
 from __future__ import unicode_literals
 from django.db import models
-
+import re
 class UserManager(models.Manager):
     def validator(self, postData):
         # print(postData.get("name"),flush=True)
         errors = {}
+
+        EMAIL_REGEX = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+
+        if postData['email'] and not re.match(EMAIL_REGEX, postData['email']):
+                errors['email1'] = "invalid email"    
 
         if (User.objects.filter(username=postData['username']).exists()):
                 errors['username1'] = "User name already exists"
@@ -36,8 +41,8 @@ class UserManager(models.Manager):
 
 class User(models.Model):
     name = models.CharField(max_length=255)
-    username = models.CharField(max_length=255)
+    username = models.CharField(max_length=255,unique=True)
     mobile = models.IntegerField()
-    email = models.CharField(max_length=255)
+    email = models.EmailField(max_length=255)
     password = models.CharField(max_length=255)
     objects = UserManager()
